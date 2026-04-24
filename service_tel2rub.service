@@ -1,0 +1,11 @@
+[Unit]
+Description=Telegram to Rubika Bridge
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/tel2rub
+ExecStart=/usr/bin/python3 main.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
