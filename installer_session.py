@@ -1,8 +1,7 @@
 import os
 from pathlib import Path
 from dotenv import set_key, load_dotenv
-from rubpy import RubikaClient
-
+from rubpy import Client as RubikaClient
 
 ENV_FILE = ".env"
 SESSION_FILE = "rubika.session"
