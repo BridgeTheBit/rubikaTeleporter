@@ -1,4 +1,4 @@
-[فارسی](https://github.com/BridgeTheBit/tel2rub/edit/main/README_FA.md)
+[فارسی](https://github.com/BridgeTheBit/tel2rub/main/README_FA.md)
 # 🚀 Tel2Rub — Telegram to Rubika Bridge
 
 **Tel2Rub** is a professional message‑sync tool that forwards Telegram messages directly into Rubika.  
