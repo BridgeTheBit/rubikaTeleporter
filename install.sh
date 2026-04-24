@@ -47,6 +47,7 @@ sudo apt install python3-venv python3-pip -y
 echo ""
 echo "Creating virtual environment..."
 
+cd tel2rub
 python3 -m venv venv
 source venv/bin/activate
 
