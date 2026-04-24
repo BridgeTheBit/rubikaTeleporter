@@ -1,87 +1,98 @@
+#!/usr/bin/env python3
+
 import os
+import sys
 from pathlib import Path
-from dotenv import set_key, load_dotenv
+from dotenv import load_dotenv, set_key
 from rubpy import Client as RubikaClient
 
-ENV_FILE = ".env"
-SESSION = "rubsession"
-SESSION_FILE = "rubika.session"
+
+# ==========================================================
+# PATHS
+# ==========================================================
+BASE_DIR = Path(__file__).resolve().parent
+ENV_FILE = BASE_DIR / ".env"
+
+load_dotenv(ENV_FILE)
+
+DEFAULT_SESSION_NAME = "rubika_session"
 
 
-def ask(msg):
-    return input(msg + " ").strip()
+# ==========================================================
+# HELPERS
+# ==========================================================
+def session_exists(session_name: str) -> bool:
+    """
+    Check if rubpy session files exist.
+    """
+    possible_files = [
+        Path(session_name),
+        Path(f"{session_name}.session"),
+        Path(f"{session_name}.sqlite"),
+    ]
+
+    return any(f.exists() for f in possible_files)
 
 
-def create_new_session():
-    print("\n=== Creating new Rubika session ===\n")
+def save_session_to_env(session_name: str):
+    """
+    Save session name to .env file.
+    """
+    if not ENV_FILE.exists():
+        ENV_FILE.touch()
 
-    phone = ask("Enter your phone number (09...):")
-    if not phone.startswith("09"):
-        print("❌ Invalid phone number")
-        return None
+    set_key(str(ENV_FILE), "RUBIKA_SESSION", session_name)
+    print("✅ Session saved to .env")
 
-    client = RubikaClient(name=SESSION)
 
-    print("Sending verification code...")
+def create_new_session(session_name: str):
+    """
+    Create new rubika session interactively.
+    """
+    print("\n🔐 Creating new Rubika session...\n")
+
     try:
-        sent_code = client.send_code(phone)
+        client = RubikaClient(name=session_name)
+
+        # rubpy handles asking phone and code internally
+        client.start()
+
+        print("✅ Login successful.")
+        client.disconnect()
+
     except Exception as e:
-        print("❌ Failed to send code:", e)
-        return None
-
-    code = ask("Enter verification code:")
-
-    try:
-        client.sign_in(phone, sent_code, code)
-    except Exception as e:
-        print("❌ Login failed:", e)
-        return None
-
-    client.save_session(SESSION_FILE)
-    client.disconnect()
-
-    print(f"✔ Session saved as {SESSION_FILE}")
-
-    set_key(ENV_FILE, "RUBIKA_SESSION", SESSION_FILE)
-
-    return SESSION_FILE
+        print(f"\n❌ Session creation failed: {e}")
+        sys.exit(1)
 
 
-def choose_session():
-    exists = Path(SESSION_FILE).exists()
+# ==========================================================
+# MAIN LOGIC
+# ==========================================================
+def main():
+    print("\n=== Rubika Session Setup ===\n")
 
-    if exists:
-        print(f"\nExisting Rubika session found: {SESSION_FILE}\n")
-        choice = ask("Use this session? (y/n):")
+    existing_session = os.getenv("RUBIKA_SESSION", DEFAULT_SESSION_NAME)
 
-        if choice.lower().startswith("y"):
-            print("✔ Using existing session")
-            set_key(ENV_FILE, "RUBIKA_SESSION", SESSION_FILE)
-            return SESSION_FILE
+    if session_exists(existing_session):
+        print(f"✔ Existing session detected: {existing_session}")
 
-        print("Creating new session...")
-        return create_new_session()
+        choice = input("Use existing session? (y/n): ").strip().lower()
+
+        if choice == "y":
+            print("✅ Using existing session.")
+            save_session_to_env(existing_session)
+            return
+
+        else:
+            print("⚠ Creating new session...")
+            create_new_session(existing_session)
+            save_session_to_env(existing_session)
+            return
 
     else:
-        print("No session found → Creating new session")
-        return create_new_session()
-
-
-def main():
-    print("=== Rubika Session Setup ===")
-
-    if not os.path.exists(ENV_FILE):
-        open(ENV_FILE, "w").close()
-
-    load_dotenv(ENV_FILE)
-
-    session = choose_session()
-
-    if not session:
-        print("❌ Session setup failed!")
-        exit(1)
-
-    print("✔ Rubika session setup completed successfully.")
+        print("No existing session found.")
+        create_new_session(existing_session)
+        save_session_to_env(existing_session)
 
 
 if __name__ == "__main__":
