@@ -65,13 +65,14 @@ touch queue/tasks.jsonl
 echo ""
 echo "Installing service..."
 
-chmod +x tel2rub
-
 sudo cp service/tel2rub.service /etc/systemd/system/
 
 sudo systemctl daemon-reload
 sudo systemctl enable tel2rub
 sudo systemctl start tel2rub
+
+chmod +x tel2rub
+sudo ln -s /root/tel2rub/tel2rub /usr/local/bin/tel2rub
 
 echo ""
 echo "✅ Installation finished"
