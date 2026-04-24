@@ -81,7 +81,7 @@ mv ${NEW_SOURCE} ${INSTALL_DIR}
 cd ${INSTALL_DIR}
 
 # ensure installer_session.py exists inside install folder
-cp -f installer_session.py ${INSTALL_DIR}/
+# cp -f installer_session.py ${INSTALL_DIR}/
 
 echo ${LATEST_TAG} > VERSION
 
