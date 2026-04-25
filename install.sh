@@ -141,7 +141,6 @@ chown -R ${APP_USER}:${APP_USER} ${INSTALL_DIR}
 # INSTALL CLI COMMAND
 # --------------------------------
 echo -e "${YELLOW}Installing CLI command...${NC}"
-chmod -w ${INSTALL_DIR}/tel2rub
 chmod +x ${INSTALL_DIR}/tel2rub
 ln -sf ${INSTALL_DIR}/tel2rub /usr/local/bin/tel2rub
 
